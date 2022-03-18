@@ -3,6 +3,7 @@ package com.example.confirmationletter;
 import com.example.dao.CurrencyDao;
 import com.example.domain.Currency;
 import com.example.domain.*;
+import com.example.domain.Record;
 import com.example.record.domain.TempRecord;
 import com.example.record.service.impl.Constants;
 import com.example.record.service.impl.StringUtils;
