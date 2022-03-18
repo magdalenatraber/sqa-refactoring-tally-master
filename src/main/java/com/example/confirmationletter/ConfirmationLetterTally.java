@@ -27,7 +27,7 @@ public class ConfirmationLetterTally {
         Map<String, BigDecimal> result = calculateRetrieveAmounts(records, faultyRecords,
                 client, faultyAccountNumberRecordList, sansDuplicateFaultRecordsList);
 
-        result.put("CreditBatchTotal", creditBatchTotal(batchTotals, client));
+        result.put("CreditBatchTotal", creditBatchTotal(batchTotals, client.getAmountDivider()));
         result.put("DebitBatchTotal", debitBatchTotal(batchTotals, client));
         return result;
     }
@@ -398,7 +398,7 @@ public class ConfirmationLetterTally {
     }
 
     BigDecimal creditBatchTotal(Map<Integer, BatchTotal> batchTotals,
-                                        Client client) {
+                                        BigDecimal amountDivider) {
         BigDecimal sum = BigDecimal.ZERO;
         Iterator<BatchTotal> itr = batchTotals.values().iterator();
         while (itr.hasNext()) {
@@ -406,8 +406,7 @@ public class ConfirmationLetterTally {
 
             sum = sum.add(total.getCreditValue());
         }
-        BigDecimal divider = new BigDecimal(client.getAmountDivider());
-        sum = sum.divide(divider);
+        sum = sum.divide(amountDivider);
         return sum;
     }
 
@@ -419,7 +418,7 @@ public class ConfirmationLetterTally {
             BatchTotal total = itr.next();
             sum = sum.add(total.getCreditCounterValueForDebit());
         }
-        BigDecimal divider = new BigDecimal(client.getAmountDivider());
+        BigDecimal divider = client.getAmountDivider();
         sum = sum.divide(divider);
         return sum;
     }
