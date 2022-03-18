@@ -13,15 +13,6 @@ import java.util.*;
 
 public class ConfirmationLetterTally {
 
-    // private static Log logger = LogFactory.getLog(ConfirmationLetterGenerator.class);
-    @SuppressWarnings("unused")
-    private static final String COLLECTIVE = "collectief";
-
-    private String crediting;
-    private String debiting;
-    private String debit;
-    private String credit;
-    private String type;
     private CurrencyDao currencyDao;
 
     public Map<String, BigDecimal> calculateAmounts(
@@ -41,7 +32,6 @@ public class ConfirmationLetterTally {
         return result;
     }
 
-    // Calculate sum amount from faultyAccountnumber list
     private Map<String, BigDecimal> calculateAmountsFaultyAccountNumber(
             List<TempRecord> faultyAccountNumberRecordList, Client client) {
         Map<String, BigDecimal> retrievedAmountsFaultyAccountNumber = new HashMap<String, BigDecimal>();
@@ -55,9 +45,6 @@ public class ConfirmationLetterTally {
         BigDecimal faultyAccRecordAmountDebitEUR = new BigDecimal(0);
 
         for (TempRecord faultyAccountNumberRecord : faultyAccountNumberRecordList) {
-            // // logger.debug("faultyAccountNumberRecord: "+
-            // faultyAccountNumberRecord);
-            // FL
             if (StringUtils.isBlank(faultyAccountNumberRecord.getSign())) {
                 faultyAccountNumberRecord.setSign(client.getCreditDebit());
             }
@@ -438,119 +425,4 @@ public class ConfirmationLetterTally {
         return new BigDecimal(d);
     }
 
-    private List<AmountAndRecordsPerBank> amountAndRecords(
-            List<Record> records, String transactionType) {
-        List<AmountAndRecordsPerBank> list = new ArrayList<AmountAndRecordsPerBank>();
-        String typeOfTransaction = transactionType.equalsIgnoreCase(crediting) ? crediting
-                : debiting;
-        type = typeOfTransaction.equalsIgnoreCase(crediting) ? credit : debit;
-        if (transactionType.equalsIgnoreCase(typeOfTransaction)) {
-            for (Record record : records) {
-                getAmountAndRecords(record, list, transactionType);
-            }
-        }
-        return list;
-    }
-
-    private List<AmountAndRecordsPerBank> getAmountAndRecords(Record record,
-                                                              List<AmountAndRecordsPerBank> list, String transactionType) {
-        Map<String, String> map = new HashMap<String, String>();
-        if (record.getFeeRecord().compareTo(0) == 0
-                && !map.containsKey(record.getBeneficiaryName())) {
-
-            if (transactionType.equalsIgnoreCase(Constants.CREDITING)) {
-
-                if (record.getBeneficiaryName() != null
-                        && !record.getBeneficiaryName().equalsIgnoreCase(
-                        Constants.RBTT_BANK_ALTERNATE)) {
-                    Boolean newList = true;
-                    if (list.size() == 0
-                            && record.getSign().equalsIgnoreCase(type)) {
-
-                        AmountAndRecordsPerBank aARPB = new AmountAndRecordsPerBank();
-                        aARPB.setBankName(record.getBank().getName());
-                        aARPB.setTotalRecord(1);
-                        aARPB.setAmount(record.getAmount());
-                        aARPB.setCurrencyType(record.getCurrency()
-                                .getCurrencyType());
-                        aARPB.setAccountNumber(record
-                                .getBeneficiaryAccountNumber());
-                        list.add(aARPB);
-                        newList = false;
-                    }
-                    if (newList && record.getSign().equalsIgnoreCase(type)) {
-
-                        Boolean newRecord = true;
-                        for (AmountAndRecordsPerBank object : list) {
-                            if (object.getBankName().equalsIgnoreCase(
-                                    record.getBank().getName())
-                                    && object.getCurrencyType()
-                                    .equalsIgnoreCase(
-                                            record.getCurrency()
-                                                    .getCurrencyType())) {
-                                object.setAmount(object.getAmount().add(
-                                        record.getAmount()));
-                                object
-                                        .setTotalRecord(object.getTotalRecord() + 1);
-                                newRecord = false;
-                            }
-                        }
-//
-                    }
-                }
-            }
-
-            if (transactionType.equalsIgnoreCase(Constants.DEBITING)) {
-
-                if (record.getBeneficiaryName() == null) {
-                    Boolean newList = true;
-                    if (list.size() == 0
-                            && record.getSign().equalsIgnoreCase(type)) {
-
-                        AmountAndRecordsPerBank aARPB = new AmountAndRecordsPerBank();
-                        aARPB.setBankName(record.getBank().getName());
-                        aARPB.setTotalRecord(1);
-                        aARPB.setAmount(record.getAmount());
-                        aARPB.setCurrencyType(record.getCurrency()
-                                .getCurrencyType());
-                        aARPB.setAccountNumber(record
-                                .getBeneficiaryAccountNumber());
-                        list.add(aARPB);
-                        newList = false;
-                    }
-                    if (newList && record.getSign().equalsIgnoreCase(type)) {
-                        // logger.info("bank gegevens: "+record.getSign()+" : "+record.getBank().getName()+" : "+record.getBeneficiaryName());
-                        Boolean newRecord = true;
-                        for (AmountAndRecordsPerBank object : list) {
-                            if (object.getBankName().equalsIgnoreCase(
-                                    record.getBank().getName())
-                                    && object.getCurrencyType()
-                                    .equalsIgnoreCase(
-                                            record.getCurrency()
-                                                    .getCurrencyType())) {
-                                object.setAmount(object.getAmount().add(
-                                        record.getAmount()));
-                                object
-                                        .setTotalRecord(object.getTotalRecord() + 1);
-                                newRecord = false;
-                            }
-                        }
-//                        if (newRecord) {
-//                            AmountAndRecordsPerBank aARPB = new AmountAndRecordsPerBank();
-//                            aARPB.setBankName(record.getBank().getName());
-//                            aARPB.setTotalRecord(1);
-//                            aARPB.setAmount(record.getAmount());
-//                            aARPB.setCurrencyType(record.getCurrency()
-//                                    .getCurrencyType());
-//                            aARPB.setAccountNumber(record
-//                                    .getBeneficiaryAccountNumber());
-//                            list.add(aARPB);
-//                        }
-                    }
-                }
-            }
-            // del end
-        }
-        return list;
-    }
 }
