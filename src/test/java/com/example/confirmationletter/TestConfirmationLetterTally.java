@@ -63,13 +63,13 @@ public class TestConfirmationLetterTally {
         Map<String, String> profile = new HashMap<>();
         Client client = new Client(profile, "+", "false", "100");
 
-        Map<Integer, BatchTotal> batchTotals = new HashMap<>();
-        batchTotals.put(1, new BatchTotal(BigDecimal.valueOf(1000), BigDecimal.valueOf(2500)));
-        batchTotals.put(2, new BatchTotal(BigDecimal.valueOf(2000), BigDecimal.valueOf(2100)));
-        batchTotals.put(3, new BatchTotal(BigDecimal.valueOf(3000), BigDecimal.valueOf(1200)));
+        List<BatchTotal> batchTotals = new ArrayList<BatchTotal>() {};
+        batchTotals.add( new BatchTotal(BigDecimal.valueOf(1000), BigDecimal.valueOf(2500)));
+        batchTotals.add( new BatchTotal(BigDecimal.valueOf(2000), BigDecimal.valueOf(2100)));
+        batchTotals.add( new BatchTotal(BigDecimal.valueOf(3000), BigDecimal.valueOf(1200)));
 
         ConfirmationLetterTally confirmationLetterTally = new ConfirmationLetterTally();
-        BigDecimal result = confirmationLetterTally.creditBatchTotal(batchTotals, BigDecimal.valueOf(100));
+        BigDecimal result = confirmationLetterTally.creditBatchTotal(batchTotals, BigDecimal.valueOf(100),BatchTotal::getCreditValue );
 
         Assert.assertEquals(BigDecimal.valueOf(60),result);
     }
@@ -79,13 +79,13 @@ public class TestConfirmationLetterTally {
         Map<String, String> profile = new HashMap<>();
         Client client = new Client(profile, "+", "false", "100");
 
-        Map<Integer, BatchTotal> batchTotals = new HashMap<>();
-        batchTotals.put(1, new BatchTotal(BigDecimal.valueOf(1010), BigDecimal.ZERO));
-        batchTotals.put(2, new BatchTotal(BigDecimal.valueOf(2001), BigDecimal.ZERO));
-        batchTotals.put(3, new BatchTotal(BigDecimal.valueOf(3005), BigDecimal.ZERO));
+        List<BatchTotal> batchTotals = new ArrayList<>();
+        batchTotals.add( new BatchTotal(BigDecimal.valueOf(1010), BigDecimal.ZERO));
+        batchTotals.add( new BatchTotal(BigDecimal.valueOf(2001), BigDecimal.ZERO));
+        batchTotals.add( new BatchTotal(BigDecimal.valueOf(3005), BigDecimal.ZERO));
 
         ConfirmationLetterTally confirmationLetterTally = new ConfirmationLetterTally();
-        BigDecimal result = confirmationLetterTally.creditBatchTotal(batchTotals, BigDecimal.valueOf(100));
+        BigDecimal result = confirmationLetterTally.creditBatchTotal(batchTotals, BigDecimal.valueOf(100),BatchTotal::getCreditValue);
 
         Assert.assertEquals(BigDecimal.valueOf(60.16),result);
     }
