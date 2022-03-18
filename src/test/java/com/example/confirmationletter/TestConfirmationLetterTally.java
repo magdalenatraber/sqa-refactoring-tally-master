@@ -2,6 +2,7 @@ package com.example.confirmationletter;
 
 import com.example.dao.CurrencyDao;
 import com.example.domain.*;
+import com.example.domain.Record;
 import com.example.record.domain.TempRecord;
 import com.example.record.service.impl.Constants;
 import org.junit.Assert;
@@ -56,4 +57,38 @@ public class TestConfirmationLetterTally {
         Assert.assertEquals(BigDecimal.valueOf(60), res.get("CreditBatchTotal"));
         Assert.assertEquals(BigDecimal.valueOf(58), res.get("DebitBatchTotal"));
     }
+
+    @Test
+    public void creditBatchTotalSumWithoutFractions(){
+        Map<String, String> profile = new HashMap<>();
+        Client client = new Client(profile, "+", "false", "100");
+
+        Map<Integer, BatchTotal> batchTotals = new HashMap<>();
+        batchTotals.put(1, new BatchTotal(BigDecimal.valueOf(1000), BigDecimal.valueOf(2500)));
+        batchTotals.put(2, new BatchTotal(BigDecimal.valueOf(2000), BigDecimal.valueOf(2100)));
+        batchTotals.put(3, new BatchTotal(BigDecimal.valueOf(3000), BigDecimal.valueOf(1200)));
+
+        ConfirmationLetterTally confirmationLetterTally = new ConfirmationLetterTally();
+        BigDecimal result = confirmationLetterTally.creditBatchTotal(batchTotals, client);
+
+        Assert.assertEquals(BigDecimal.valueOf(60),result);
+    }
+
+    @Test
+    public void creditBatchTotalSumWithFractions(){
+        Map<String, String> profile = new HashMap<>();
+        Client client = new Client(profile, "+", "false", "100");
+
+        Map<Integer, BatchTotal> batchTotals = new HashMap<>();
+        batchTotals.put(1, new BatchTotal(BigDecimal.valueOf(1010), BigDecimal.ZERO));
+        batchTotals.put(2, new BatchTotal(BigDecimal.valueOf(2001), BigDecimal.ZERO));
+        batchTotals.put(3, new BatchTotal(BigDecimal.valueOf(3005), BigDecimal.ZERO));
+
+        ConfirmationLetterTally confirmationLetterTally = new ConfirmationLetterTally();
+        BigDecimal result = confirmationLetterTally.creditBatchTotal(batchTotals, client);
+
+        Assert.assertEquals(BigDecimal.valueOf(60.16),result);
+    }
+
+
 }

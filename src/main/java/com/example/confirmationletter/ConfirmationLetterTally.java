@@ -173,8 +173,6 @@ public class ConfirmationLetterTally {
                             Constants.DEBIT)) {
                         recordAmountEUR = record.getAmount().add(
                                 recordAmountEUR);
-                        // system.out.println("recordAmountEUR: ["+ recordAmountEUR + "]");
-
                     }
                     if (record.getCurrency().getCode().equals(
                             Constants.USD_CURRENCY_CODE)
@@ -182,7 +180,7 @@ public class ConfirmationLetterTally {
                             Constants.DEBIT)) {
                         recordAmountUSD = record.getAmount().add(
                                 recordAmountUSD);
-                        // system.out.println("recordAmountUSD: ["+ recordAmountUSD + "]");
+
                     }
                 }
                 retrievedAmounts.put(Constants.CURRENCY_EURO, recordAmountEUR);
@@ -190,11 +188,10 @@ public class ConfirmationLetterTally {
                 retrievedAmounts.put(Constants.CURRENCY_FL, recordAmountFL);
             }
         }
-        // Not Balanced
+
         else {
 
             for (Record record : records) {
-//                logger.debug("COUNTERTRANSFER ["+record.getIsCounterTransferRecord()+"] FEERECORD ["+record.getFeeRecord()+"]");
                 if (record.getIsCounterTransferRecord().compareTo(new Integer(0)) == 0
                         && record.getFeeRecord().compareTo(new Integer(0)) == 0) {
                     if ((record.getCurrency().getCode().equals(
@@ -251,7 +248,7 @@ public class ConfirmationLetterTally {
                 }
 
             }
-            // Sansduplicate
+
             for (TempRecord sansDupRec : sansDuplicateFaultRecordsList) {
 
                 Integer currencyCode = sansDupRec.getCurrencyCode();
@@ -400,29 +397,31 @@ public class ConfirmationLetterTally {
         return retrievedAmounts;
     }
 
-    private BigDecimal creditBatchTotal(Map<Integer, BatchTotal> batchTotals,
+    BigDecimal creditBatchTotal(Map<Integer, BatchTotal> batchTotals,
                                         Client client) {
-        Double sum = new Double(0);
+        BigDecimal sum = BigDecimal.ZERO;
         Iterator<BatchTotal> itr = batchTotals.values().iterator();
         while (itr.hasNext()) {
             BatchTotal total = itr.next();
 
-            sum = sum + total.getCreditValue().doubleValue();
+            sum = sum.add(total.getCreditValue());
         }
-        Double d = sum / new Double(client.getAmountDivider());
-        return new BigDecimal(d);
+        BigDecimal divider = new BigDecimal(client.getAmountDivider());
+        sum = sum.divide(divider);
+        return sum;
     }
 
     private BigDecimal debitBatchTotal(Map<Integer, BatchTotal> batchTotals,
                                        Client client) {
-        Double sum = new Double(0);
+        BigDecimal sum = BigDecimal.ZERO;
         Iterator<BatchTotal> itr = batchTotals.values().iterator();
         while (itr.hasNext()) {
             BatchTotal total = itr.next();
-            sum = sum + total.getCreditCounterValueForDebit().doubleValue();
+            sum = sum.add(total.getCreditCounterValueForDebit());
         }
-        Double d = sum / new Double(client.getAmountDivider());
-        return new BigDecimal(d);
+        BigDecimal divider = new BigDecimal(client.getAmountDivider());
+        sum = sum.divide(divider);
+        return sum;
     }
 
 }
